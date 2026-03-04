@@ -9,7 +9,30 @@ namespace DeviceId;
 public static class DeviceIdHelper
 {
     /// <summary>
-    /// Gets the Windows MachineGuid from registry.
+    /// Gets the Device ID shown in Windows Settings > System > About > Device specifications.
+    /// This is the SQMClient MachineId used by Microsoft telemetry/services.
+    /// </summary>
+    public static string? GetWindowsAboutDeviceId()
+    {
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            return null;
+
+        try
+        {
+            // This is the Device ID shown in Windows Settings > About
+            using var key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\SQMClient");
+            var machineId = key?.GetValue("MachineId")?.ToString();
+            // Remove curly braces if present for consistency
+            return machineId?.Trim('{', '}');
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Gets the Windows MachineGuid from registry (Cryptography key).
     /// Unique per Windows installation. Changes on OS reinstall.
     /// </summary>
     public static string? GetMachineGuid()
@@ -212,6 +235,7 @@ public static class DeviceIdHelper
         return new DeviceInfo
         {
             ComputerName = GetComputerName(),
+            WindowsAboutDeviceId = GetWindowsAboutDeviceId(),
             MachineGuid = GetMachineGuid(),
             SmbiosUuid = GetSmbiosUuid(),
             MotherboardSerial = GetMotherboardSerial(),
@@ -227,6 +251,8 @@ public static class DeviceIdHelper
 public class DeviceInfo
 {
     public string? ComputerName { get; init; }
+    /// <summary>The Device ID shown in Windows Settings > About</summary>
+    public string? WindowsAboutDeviceId { get; init; }
     public string? MachineGuid { get; init; }
     public string? SmbiosUuid { get; init; }
     public string? MotherboardSerial { get; init; }

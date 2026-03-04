@@ -8,6 +8,7 @@ if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
     Console.WriteLine("This tool is designed for Windows only.");
     Console.WriteLine($"Current OS: {RuntimeInformation.OSDescription}");
     Console.WriteLine("\nOn Windows, this tool retrieves:");
+    Console.WriteLine("  - Device ID (shown in Settings > About)");
     Console.WriteLine("  - MachineGuid (from registry)");
     Console.WriteLine("  - SMBIOS UUID (hardware-based)");
     Console.WriteLine("  - Motherboard Serial");
@@ -21,6 +22,10 @@ if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 var info = DeviceIdHelper.GetDeviceInfo();
 
 Console.WriteLine($"Computer Name:        {info.ComputerName}");
+Console.WriteLine();
+
+Console.WriteLine("--- Device ID (Settings > System > About) ---");
+Console.WriteLine($"Device ID:            {info.WindowsAboutDeviceId ?? "N/A"}");
 Console.WriteLine();
 
 Console.WriteLine("--- Software-based IDs (change on OS reinstall) ---");
